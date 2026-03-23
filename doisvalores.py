@@ -1,3 +1,5 @@
+# Calculadora simples com dois valores.
+
 def simplesMensagem():
     print("Calculadora Simples")
     print("-" * 20)
