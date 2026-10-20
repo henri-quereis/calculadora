@@ -1,29 +1,29 @@
-#include <stdio.h>
+// Calculadora Simples que insere dois valores e realiza operações matemáticas básicas (+, -, *, /) com eles.
 
+#include <stdio.h>
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
+
+int lerInteiro(const char *mensagem, int *valor);
 int soma(int n1, int n2);
 int sub(int n1, int n2);
 int mult(int n1, int n2);
-double div(int n1, int n2);
+double dividir(int n1, int n2);
 
 int main()
 {
-    int primeiroValor, segundoValor = 0;
+    int primeiroValor, segundoValor;
     char operacao;
     double resultado;
 
-    printf("Informe o primeiro valor: ");
-    scanf("%d", &primeiroValor);
-
-    while (segundoValor == 0)
+    if (!lerInteiro("Informe o primeiro valor: ", &primeiroValor) ||
+        !lerInteiro("Informe o segundo valor: ", &segundoValor))
     {
-        printf("Informe o segundo valor: ");
-        scanf("%d", &segundoValor);
-
-        if (segundoValor == 0)
-        {
-            printf("\nNão é possível dividir por zero.\n");
-            
-        }
+        printf("\nEntrada encerrada.\n");
+        return 1;
     }
 
     do
@@ -48,7 +48,17 @@ int main()
         }
         else if (operacao == '/')
         {
-            resultado = div(primeiroValor, segundoValor);
+            while (segundoValor == 0)
+            {
+                printf("Não é possível dividir por zero. ");
+                if (!lerInteiro("Informe outro valor: ", &segundoValor))
+                {
+                    printf("\nEntrada encerrada.\n");
+                    return 1;
+                }
+            }
+
+            resultado = dividir(primeiroValor, segundoValor);
             break;
         }
         else
@@ -60,6 +70,60 @@ int main()
     printf("%d %c %d = %.1f\n", primeiroValor, operacao, segundoValor, resultado);
     
     return 0;
+}
+
+int lerInteiro(const char *mensagem, int *valor)
+{
+    char entrada[128];
+    char *fim;
+    long numero;
+
+    while (1)
+    {
+        printf("%s", mensagem);
+        if (fgets(entrada, sizeof(entrada), stdin) == NULL)
+        {
+            return 0;
+        }
+
+        if (strchr(entrada, '\n') == NULL)
+        {
+            int caractere = getchar();
+            if (caractere != EOF)
+            {
+                while (caractere != '\n' && caractere != EOF)
+                {
+                    caractere = getchar();
+                }
+                printf("Entrada inválida. Informe um número inteiro.\n");
+                continue;
+            }
+        }
+
+        errno = 0;
+        numero = strtol(entrada, &fim, 10);
+
+        if (fim == entrada)
+        {
+            printf("Entrada inválida. Informe um número inteiro.\n");
+            continue;
+        }
+
+        while (isspace((unsigned char)*fim))
+        {
+            fim++;
+        }
+
+        if (*fim != '\0' || errno == ERANGE || numero < INT_MIN ||
+            numero > INT_MAX)
+        {
+            printf("Entrada inválida. Informe um número inteiro.\n");
+            continue;
+        }
+
+        *valor = (int)numero;
+        return 1;
+    }
 }
 
 int soma(int n1, int n2)
@@ -77,7 +141,7 @@ int mult(int n1, int n2)
     return n1*n2;
 }
 
-double div(int n1, int n2)
+double dividir(int n1, int n2)
 {
     return (double)n1/n2;
 }
