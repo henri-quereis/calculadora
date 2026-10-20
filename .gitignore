@@ -1,0 +1,12 @@
+# Linguagem C
+*.exe
+*.o
+*.obj
+*.out
+build/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
